@@ -475,6 +475,7 @@ var readtextdatabrowser = function (file, loadedcallback, errorcallback) {
  */
 var readbinarydatabrowser = function (file, loadedcallback, errorcallback) {
 
+    console.log(JSON.stringify(file,null,2));
     var reader = new FileReader();
     var url = file.name;
     var comp = iscompressed(url);
@@ -542,6 +543,40 @@ var readdatafromurl_node = function (url, binary,loadedcallback, errorcallback) 
 
 };
 
+// --------------------------------------------------------------------
+// Cordova Hook 1 -- read from url
+
+
+/** read text data from url. (Cordova)
+ * @alias BisCoreGenericIO~readtextdataurl_cordova
+ * @param {string} url - the url
+ * @param {BisCoreGenericIO.TextDataRead} callback - callback function
+ * @param {BisCoreGenericIO.MessageCallback} errror - error callback function
+ */
+var readtextdatafromurl_cordova = function (url, loadedcallback, errorcallback) {
+
+    window.resolveLocalFileSystemURL(url, (fileEntry) => {
+        fileEntry.file( (file) => {
+            readtextdatabrowser(file,loadedcallback,errorcallback);
+        },errorcallback);
+    },errorcallback);
+};
+
+/** read binary data from url. (Cordova)
+ * if filename ends in .gz also decompress.
+ * @alias BisCoreGenericIO~readbinarydataurl
+ * @param {string} url - the url
+ * @param {BisCoreGenericIO.BinaryDataRead} callback - callback function
+ * @param {BisCoreGenericIO.MessageCallback} errror - error callback function
+ */
+var readbinarydatafromurl_cordova = function (url, loadedcallback, errorcallback) {
+    window.resolveLocalFileSystemURL(url, (fileEntry) => {
+        fileEntry.file( (file) => {
+            readbinarydatabrowser(file,loadedcallback,errorcallback);
+        },errorcallback);
+    },errorcallback);
+};
+
 /** read text data from url.
  * @alias BisCoreGenericIO~readtextdataurl
  * @param {string} url - the url
@@ -553,6 +588,9 @@ var readtextdatafromurl = function (url, loadedcallback, errorcallback, requesth
     if (environment === 'node') 
         return readdatafromurl_node(url,false,loadedcallback,errorcallback);
 
+    if (url.indexOf('file')===0)
+        return readtextdatafromurl_cordova(url, loadedcallback, errorcallback);
+    
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -593,6 +631,11 @@ var readbinarydatafromurl = function (url, loadedcallback, errorcallback, reques
     if (environment === 'node') 
         return readdatafromurl_node(url,true,loadedcallback,errorcallback);
 
+    if (url.indexOf('file')===0)
+        return readbinarydatafromurl_cordova(url, loadedcallback, errorcallback);
+    
+
+    
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';

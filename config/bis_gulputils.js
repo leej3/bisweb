@@ -197,9 +197,9 @@ var createHTML=function(toolname,outdir,libjs,commoncss,gpl=true) {
         if (libjs!=='') {
             if (toolname!=="index") {
                 if (gpl) 
-                    alljs=[ 'webcomponents-lite.js', 'jquery.min.js', 'three.min.js', 'd3.min.js' , 'bootstrap.min.js', 'libbiswasm_wasm.js', libjs  ];
+                    alljs=[ 'cordova.js', 'webcomponents-lite.js', 'jquery.min.js', 'three.min.js', 'd3.min.js' , 'bootstrap.min.js', 'libbiswasm_wasm.js', libjs  ];
                 else
-                    alljs=[ 'webcomponents-lite.js', 'jquery.min.js', 'three.min.js', 'd3.min.js',  'bootstrap.min.js', 'libbiswasm_nongpl_wasm.js', libjs  ];
+                    alljs=[ 'cordova.js', 'webcomponents-lite.js', 'jquery.min.js', 'three.min.js', 'd3.min.js',  'bootstrap.min.js', 'libbiswasm_nongpl_wasm.js', libjs  ];
             } else {
                 alljs=[ 'jquery.min.js', 'bootstrap.min.js', libjs  ];
             }
