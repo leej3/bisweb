@@ -6,7 +6,6 @@ import pandas as pd
 import nibabel as nib
 from pathlib import Path
 from copy import deepcopy as dp
-from torchsummary import summary
 
 import monai
 import torch
