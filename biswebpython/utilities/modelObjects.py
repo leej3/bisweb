@@ -118,6 +118,18 @@ class UNet(pytorch_lightning.LightningModule):
         images, labels = batch["IMAGE"], batch["SEGM"]
         output = self.forward(images)
         loss = self.loss_function(output, labels)
+
+        # Save an image summary using MONAI
+        if batch_idx==0:
+            monai.visualize.img2tensorboard.plot_2d_or_3d_image(data=images,
+                            step=self.current_epoch,
+                            writer=self.logger.experiment,
+                            tag='Input/Training')
+            monai.visualize.img2tensorboard.plot_2d_or_3d_image(data=torch.argmax(output, dim=1, keepdim=True),
+                            step=self.current_epoch,
+                            writer=self.logger.experiment,
+                            tag='Output/Training')
+
         return {"loss": loss}
 
 
@@ -150,6 +162,7 @@ class UNet(pytorch_lightning.LightningModule):
         sw_batch_size = self.userinputs['sw_batch_size']
         outputs = sliding_window_inference(images, roi_size, sw_batch_size, self.forward)
 
+
         loss = self.loss_function(outputs, labels)
         value = self.val_metric(y_pred=outputs, y=labels)
 
@@ -159,10 +172,11 @@ class UNet(pytorch_lightning.LightningModule):
                             step=self.current_epoch,
                             writer=self.logger.experiment,
                             tag='Input/Validation')
-            monai.visualize.img2tensorboard.plot_2d_or_3d_image(data=outputs,
+            monai.visualize.img2tensorboard.plot_2d_or_3d_image(data=torch.argmax(outputs, dim=1, keepdim=True),
                             step=self.current_epoch,
                             writer=self.logger.experiment,
                             tag='Output/Validation')
+
 
         return {"val_loss": loss, "val_dice": value}
 

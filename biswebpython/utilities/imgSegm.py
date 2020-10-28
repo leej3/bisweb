@@ -430,7 +430,8 @@ def initTrainer(logL, gpuidx, dattrs):
         # if hasattr(trainer, key):
         if key in trainer.default_attributes():
             vars(trainer)[key] = dattrs[key]
-            # TODO: TURN OFF VALIDATION--------------------------------------
+            # TODO: val_percent_check cannnot be assigned with vars()--------------------------------------
+            # TODO: fix with the following if statement--------------------------------------
             if key == 'val_percent_check':
                 trainer.val_percent_check = 0.0
 
@@ -453,6 +454,9 @@ def getAffineMatrix(orientation, spacing, dimension):
             affine[1, 1] *=  -1
         if orientation[2] == 'I':
             affine[2, 2] *=  -1
+    else:
+        # TODO: xenos please take a look at it---------------------------------------------
+        pass
 
     return affine
 
@@ -512,7 +516,9 @@ def predictionAndEvaluation(params, test_loader, device, model):
 
             # Remove the translation component
             # TODO: 2D-----------------------------------------------------------------------------------------
+            # TODO: xenos please take a look at it
             target_affine[0:params['model']['dimensions'],params['model']['dimensions']] = 0
+            # TODO: xenos please take a look at it: resampling ------------------------------------------------------------------
             monaiData.write_nifti(largest.detach().cpu()[0, 0,...].numpy(), output_path,
                         mode='nearest',
                         affine=test_affine,
@@ -625,7 +631,10 @@ def imageSegmentation(paramfile, debug):
         TRAINER = initTrainer(loggers_list, paramfile['gpu_device'], _defaults)
 
         # train
-        TRAINER.fit(MODEL, train_dataloader=loaders['train_loader'], val_dataloaders=loaders['validate_loader'])
+        if 'validate_loader' in loaders.keys():
+            TRAINER.fit(MODEL, train_dataloader=loaders['train_loader'], val_dataloaders=loaders['validate_loader'])
+        else:
+            TRAINER.fit(MODEL, train_dataloader=loaders['train_loader'])
 
     if 'test' in paramfile.keys():
 
